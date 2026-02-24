@@ -10,7 +10,7 @@ $ nix build .#checks.x86_64-linux.<TEST>
 
 where `<TEST>` is one of the following:
 
-|            |           QEMU-10.2.0          |          QEMU-10.2.1           |
-| ---------- | ------------------------------ |------------------------------- |
-| linux-6.17 | `test_qemu_10_2_0_kernel_6_17` | `test_qemu_10_2_1_kernel_6_17` |
-| linux-6.18 | `test_qemu_10_2_0_kernel_6_18` | `test_qemu_10_2_1_kernel_6_18` |
+|               |           QEMU-10.2.0             |          QEMU-10.2.1              |
+| ------------- | --------------------------------- | --------------------------------- |
+| linux-6.17.0  | `test_qemu_10_2_0_kernel_6_17_0`  | `test_qemu_10_2_1_kernel_6_17_0`  |
+| linux-6.18.13 | `test_qemu_10_2_0_kernel_6_18_13` | `test_qemu_10_2_1_kernel_6_18_13` |

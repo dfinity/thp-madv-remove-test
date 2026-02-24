@@ -1,5 +1,18 @@
 {
   "nodes": {
+    "linux_6_17_src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1759095562,
+        "narHash": "sha256-FD/s21uWF2fJQi9Jnyns4rKxU5jKsSXT+rFiFgAJGeo=",
+        "type": "tarball",
+        "url": "https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.17.tar.xz"
+      },
+      "original": {
+        "type": "tarball",
+        "url": "https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.17.tar.xz"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1771932323,
@@ -15,9 +28,24 @@
         "type": "github"
       }
     },
+    "qemu_10_2_0_src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1766519425,
+        "narHash": "sha256-AChxthS2EbOyMae4SskpqGBF8CbdRxN6L64KUCwybI4=",
+        "type": "tarball",
+        "url": "https://download.qemu.org/qemu-10.2.0.tar.xz"
+      },
+      "original": {
+        "type": "tarball",
+        "url": "https://download.qemu.org/qemu-10.2.0.tar.xz"
+      }
+    },
     "root": {
       "inputs": {
-        "nixpkgs": "nixpkgs"
+        "linux_6_17_src": "linux_6_17_src",
+        "nixpkgs": "nixpkgs",
+        "qemu_10_2_0_src": "qemu_10_2_0_src"
       }
     }
   },
