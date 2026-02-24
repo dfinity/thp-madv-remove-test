@@ -26,6 +26,7 @@
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
 
+      linux_6_12_74 = pkgs.linux_6_12;
       # Linux 6.17 was removed from nixpkgs (EOL upstream).
       # Define it locally by overriding the 6.12 kernel source.
       linux_6_17_0 = pkgs.linux_6_12.override {
@@ -40,9 +41,12 @@
         };
       };
       linux_6_18_13 = pkgs.linux_6_18;
+      linux_6_19_3 = pkgs.linux_6_19;
+      linuxPackages_6_12_74 = pkgs.linuxKernel.packages.linux_6_12;
       linuxPackages_6_17_0 = pkgs.linuxPackagesFor linux_6_17_0;
       linuxPackages_6_18_13 = pkgs.linuxKernel.packages.linux_6_18;
       linuxPackages_6_19_3 = pkgs.linuxKernel.packages.linux_6_19;
+      linuxPackages_testing = pkgs.linuxKernel.packages.linux_testing;
 
       qemu_10_2_0 = pkgs.qemu_kvm.overrideAttrs (_oldAttrs: {
         version = "10.2.0";
@@ -93,8 +97,10 @@
 
       packages.${system} = {
         inherit
+          linux_6_12_74
           linux_6_17_0
           linux_6_18_13
+          linux_6_19_3
           qemu_10_2_0
           qemu_10_2_1
           ;
@@ -117,12 +123,16 @@
       };
 
       checks.${system} = {
+        test_qemu_10_2_0_kernel_6_12_74 = test qemu_10_2_0 linuxPackages_6_12_74;
         test_qemu_10_2_0_kernel_6_17_0 = test qemu_10_2_0 linuxPackages_6_17_0;
         test_qemu_10_2_0_kernel_6_18_13 = test qemu_10_2_0 linuxPackages_6_18_13;
         test_qemu_10_2_0_kernel_6_19_3 = test qemu_10_2_0 linuxPackages_6_19_3;
+
+        test_qemu_10_2_1_kernel_6_12_74 = test qemu_10_2_1 linuxPackages_6_12_74;
         test_qemu_10_2_1_kernel_6_17_0 = test qemu_10_2_1 linuxPackages_6_17_0;
         test_qemu_10_2_1_kernel_6_18_13 = test qemu_10_2_1 linuxPackages_6_18_13;
         test_qemu_10_2_1_kernel_6_19_3 = test qemu_10_2_1 linuxPackages_6_19_3;
+        test_qemu_10_2_1_kernel_testing = test qemu_10_2_1 linuxPackages_testing;
       };
     };
 }
