@@ -44,7 +44,7 @@
 
         testScript = ''
           machine.wait_for_unit("multi-user.target")
-          machine.succeed("systemd-run --wait --pipe -u thp-madv-remove-test thp-madv-remove-test")
+          machine.succeed("systemd-run --service-type=exec --wait -u thp-madv-remove-test thp-madv-remove-test")
         '';
       };
     in
