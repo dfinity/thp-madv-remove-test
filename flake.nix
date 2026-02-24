@@ -41,7 +41,8 @@
       };
       linux_6_18_13 = pkgs.linux_6_18;
       linuxPackages_6_17_0 = pkgs.linuxPackagesFor linux_6_17_0;
-      linuxPackages_6_18_13 = pkgs.linuxPackages_6_18;
+      linuxPackages_6_18_13 = pkgs.linuxKernel.packages.linux_6_18;
+      linuxPackages_6_19_3 = pkgs.linuxKernel.packages.linux_6_19;
 
       qemu_10_2_0 = pkgs.qemu_kvm.overrideAttrs (_oldAttrs: {
         version = "10.2.0";
@@ -118,8 +119,10 @@
       checks.${system} = {
         test_qemu_10_2_0_kernel_6_17_0 = test qemu_10_2_0 linuxPackages_6_17_0;
         test_qemu_10_2_0_kernel_6_18_13 = test qemu_10_2_0 linuxPackages_6_18_13;
+        test_qemu_10_2_0_kernel_6_19_3 = test qemu_10_2_0 linuxPackages_6_19_3;
         test_qemu_10_2_1_kernel_6_17_0 = test qemu_10_2_1 linuxPackages_6_17_0;
         test_qemu_10_2_1_kernel_6_18_13 = test qemu_10_2_1 linuxPackages_6_18_13;
+        test_qemu_10_2_1_kernel_6_19_3 = test qemu_10_2_1 linuxPackages_6_19_3;
       };
     };
 }
