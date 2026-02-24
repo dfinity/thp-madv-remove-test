@@ -13,6 +13,19 @@
         "url": "https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.17.tar.xz"
       }
     },
+    "linux_7_rc1_src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1771795139,
+        "narHash": "sha256-hNy6PqRmfRssC7hNCzMAUKOq5PMrVIHxMDaZM6Yz3+A=",
+        "type": "tarball",
+        "url": "https://git.kernel.org/torvalds/t/linux-7.0-rc1.tar.gz"
+      },
+      "original": {
+        "type": "tarball",
+        "url": "https://git.kernel.org/torvalds/t/linux-7.0-rc1.tar.gz"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1771932323,
@@ -44,6 +57,7 @@
     "root": {
       "inputs": {
         "linux_6_17_src": "linux_6_17_src",
+        "linux_7_rc1_src": "linux_7_rc1_src",
         "nixpkgs": "nixpkgs",
         "qemu_10_2_0_src": "qemu_10_2_0_src"
       }

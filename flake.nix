@@ -9,6 +9,11 @@
       flake = false;
     };
 
+    linux_7_rc1_src = {
+      url = "https://git.kernel.org/torvalds/t/linux-7.0-rc1.tar.gz";
+      flake = false;
+    };
+
     qemu_10_2_0_src = {
       url = "https://download.qemu.org/qemu-10.2.0.tar.xz";
       flake = false;
@@ -20,6 +25,7 @@
       self,
       nixpkgs,
       linux_6_17_src,
+      linux_7_rc1_src,
       qemu_10_2_0_src,
     }:
     let
@@ -42,11 +48,20 @@
       };
       linux_6_18_13 = pkgs.linux_6_18;
       linux_6_19_3 = pkgs.linux_6_19;
+
+      linux_7_0_0_rc1 = pkgs.buildLinux {
+        version = "7.0-rc1";
+        modDirVersion = "7.0.0-rc1";
+        src = linux_7_rc1_src;
+        kernelPatches = [ ];
+        ignoreConfigErrors = true;
+      };
+
       linuxPackages_6_12_74 = pkgs.linuxKernel.packages.linux_6_12;
       linuxPackages_6_17_0 = pkgs.linuxPackagesFor linux_6_17_0;
       linuxPackages_6_18_13 = pkgs.linuxKernel.packages.linux_6_18;
       linuxPackages_6_19_3 = pkgs.linuxKernel.packages.linux_6_19;
-      linuxPackages_testing = pkgs.linuxKernel.packages.linux_testing;
+      linuxPackages_7_0_0_rc1 = pkgs.linuxPackagesFor linux_7_0_0_rc1;
 
       qemu_10_2_0 = pkgs.qemu_kvm.overrideAttrs (_oldAttrs: {
         version = "10.2.0";
@@ -101,6 +116,7 @@
           linux_6_17_0
           linux_6_18_13
           linux_6_19_3
+          linux_7_0_0_rc1
           qemu_10_2_0
           qemu_10_2_1
           ;
@@ -132,7 +148,7 @@
         test_qemu_10_2_1_kernel_6_17_0 = test qemu_10_2_1 linuxPackages_6_17_0;
         test_qemu_10_2_1_kernel_6_18_13 = test qemu_10_2_1 linuxPackages_6_18_13;
         test_qemu_10_2_1_kernel_6_19_3 = test qemu_10_2_1 linuxPackages_6_19_3;
-        test_qemu_10_2_1_kernel_testing = test qemu_10_2_1 linuxPackages_testing;
+        test_qemu_10_2_1_kernel_7_0_0_rc1 = test qemu_10_2_1 linuxPackages_7_0_0_rc1;
       };
     };
 }
