@@ -53,7 +53,20 @@
         version = "7.0-rc1";
         modDirVersion = "7.0.0-rc1";
         src = linux_7_rc1_src;
-        kernelPatches = [ ];
+        ignoreConfigErrors = true;
+      };
+
+      linux_HEAD_Makefile = builtins.readFile ./linux/Makefile;
+      var =
+        name:
+        let
+          m = builtins.match ".*\n${name} = ([^\n]*)\n.*" linux_HEAD_Makefile;
+        in
+        if m == null then "" else builtins.head m;
+
+      linux_HEAD = pkgs.buildLinux {
+        version = "${var "VERSION"}.${var "PATCHLEVEL"}.${var "SUBLEVEL"}${var "EXTRAVERSION"}";
+        src = ./linux;
         ignoreConfigErrors = true;
       };
 
@@ -62,6 +75,7 @@
       linuxPackages_6_18_13 = pkgs.linuxKernel.packages.linux_6_18;
       linuxPackages_6_19_3 = pkgs.linuxKernel.packages.linux_6_19;
       linuxPackages_7_0_0_rc1 = pkgs.linuxPackagesFor linux_7_0_0_rc1;
+      linuxPackages_HEAD = pkgs.linuxPackagesFor linux_HEAD;
 
       qemu_10_2_0 = pkgs.qemu_kvm.overrideAttrs (_oldAttrs: {
         version = "10.2.0";
@@ -117,6 +131,7 @@
           linux_6_18_13
           linux_6_19_3
           linux_7_0_0_rc1
+          linux_HEAD
           qemu_10_2_0
           qemu_10_2_1
           ;
@@ -149,6 +164,7 @@
         test_qemu_10_2_1_kernel_6_18_13 = test qemu_10_2_1 linuxPackages_6_18_13;
         test_qemu_10_2_1_kernel_6_19_3 = test qemu_10_2_1 linuxPackages_6_19_3;
         test_qemu_10_2_1_kernel_7_0_0_rc1 = test qemu_10_2_1 linuxPackages_7_0_0_rc1;
+        test_qemu_10_2_1_kernel_HEAD = test qemu_10_2_1 linuxPackages_HEAD;
       };
     };
 }

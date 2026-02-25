@@ -17,3 +17,10 @@ where `<TEST>` is one of the following:
 | linux-6.18.13 | `test_qemu_10_2_0_kernel_6_18_13` ❌ | `test_qemu_10_2_1_kernel_6_18_13`   ❌ |
 | linux-6.19.3  | `test_qemu_10_2_0_kernel_6_19_3`  ❌ | `test_qemu_10_2_1_kernel_6_19_3`    ❌ |
 | linux-7.0-rc1 |                                      | `test_qemu_10_2_1_kernel_7_0_0_rc1` ❌ |
+| linux-HEAD    |                                      | `test_qemu_10_2_1_kernel_HEAD`         |
+
+To test the kernel in the git submodule under `./linux` use:
+
+```
+nix build git+file:.?submodules=1#checks.x86_64-linux.test_qemu_10_2_1_kernel_HEAD -L
+```
