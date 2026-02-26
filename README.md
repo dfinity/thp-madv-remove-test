@@ -1,26 +1,35 @@
-Minimal reproducer for a potential kernel regression where
+Minimal reproducer for a kernel regression where
 `madvise(MADV_REMOVE)` on a 4KiB range within a huge-page-backed
 `MAP_SHARED` memfd region corrupts nearby pages.
 
-To run a VM via a specified QEMU booting a specified Linux kernel running the `thp-madv-remove-test` rust binary execute the following:
+The test runs a VM booting the specified kernel, then waits for the system to boot and reach target `multi-user.target`, then runs the Rust binary `thp-madv-remove-test` to check for the presence of the regression.
+
+The regression first happened on kernel 6.14 on [7460b470a131](https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=7460b470a131f985a70302a322617121efdd7caa) and can be reproduced with:
 
 ```
-$ nix build .#checks.x86_64-linux.<TEST>
+$ nix build .#checks.x86_64-linux.test_kernel_6_14_first_bad_7460b470a131 -L
 ```
 
-where `<TEST>` is one of the following:
+Log: [`test_kernel_6_14_first_bad_7460b470a131.log`](./test_kernel_6_14_first_bad_7460b470a131.log)
 
-|               |           QEMU-10.2.0                |          QEMU-10.2.1                   |
-| ------------- | ------------------------------------ | -------------------------------------- |
-| linux-6.12.74 | `test_qemu_10_2_0_kernel_6_12_74` ✅ | `test_qemu_10_2_1_kernel_6_12_74`   ✅ |
-| linux-6.17.0  | `test_qemu_10_2_0_kernel_6_17_0`  ❌ | `test_qemu_10_2_1_kernel_6_17_0`    ❌ |
-| linux-6.18.13 | `test_qemu_10_2_0_kernel_6_18_13` ❌ | `test_qemu_10_2_1_kernel_6_18_13`   ❌ |
-| linux-6.19.3  | `test_qemu_10_2_0_kernel_6_19_3`  ❌ | `test_qemu_10_2_1_kernel_6_19_3`    ❌ |
-| linux-7.0-rc1 |                                      | `test_qemu_10_2_1_kernel_7_0_0_rc1` ❌ |
-| linux-HEAD    |                                      | `test_qemu_10_2_1_kernel_HEAD`         |
+The test succeeded on its parent commit and can be reproduced with:
+
+```
+$ nix build .#checks.x86_64-linux.test_kernel_6_14_last_good_4b94c18d1519 -L
+```
+
+Log: [`test_kernel_6_14_last_good_4b94c18d1519.log`](./test_kernel_6_14_last_good_4b94c18d1519.log)
+
+The regression is still present on kernel 7.0-rc1 and can be reproduced with:
+
+```
+$ nix build .#checks.x86_64-linux.test_kernel_7_0_rc1 -L
+```
+
+Log: [`test_kernel_7_0_rc1.log`](./test_kernel_7_0_rc1.log)
 
 To test the kernel in the git submodule under `./linux` use:
 
 ```
-nix build git+file:.?submodules=1#checks.x86_64-linux.test_qemu_10_2_1_kernel_HEAD -L
+nix build git+file:.?submodules=1#checks.x86_64-linux.test_kernel_HEAD -L
 ```

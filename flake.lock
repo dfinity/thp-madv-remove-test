@@ -1,19 +1,32 @@
 {
   "nodes": {
-    "linux_6_17_src": {
+    "linux_6_14_first_bad_7460b470a131_src": {
       "flake": false,
       "locked": {
-        "lastModified": 1759095562,
-        "narHash": "sha256-FD/s21uWF2fJQi9Jnyns4rKxU5jKsSXT+rFiFgAJGeo=",
+        "lastModified": 1742274420,
+        "narHash": "sha256-JDC2Bs5vJldHzBV4/qzWci4IAJ8oAqx+qJ9dYemvYpk=",
         "type": "tarball",
-        "url": "https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.17.tar.xz"
+        "url": "https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/snapshot/linux-7460b470a131f985a70302a322617121efdd7caa.tar.gz"
       },
       "original": {
         "type": "tarball",
-        "url": "https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.17.tar.xz"
+        "url": "https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/snapshot/linux-7460b470a131f985a70302a322617121efdd7caa.tar.gz"
       }
     },
-    "linux_7_rc1_src": {
+    "linux_6_14_last_good_4b94c18d1519_src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1742274420,
+        "narHash": "sha256-uLYpBNTY74yglCPgpkTS4vGe7Oveyr+h5fDQnqHIrtc=",
+        "type": "tarball",
+        "url": "https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/snapshot/linux-4b94c18d15199658f1a86231663e97d3cc12d8de.tar.gz"
+      },
+      "original": {
+        "type": "tarball",
+        "url": "https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/snapshot/linux-4b94c18d15199658f1a86231663e97d3cc12d8de.tar.gz"
+      }
+    },
+    "linux_7_0_rc1_src": {
       "flake": false,
       "locked": {
         "lastModified": 1771795139,
@@ -28,38 +41,26 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1771932323,
-        "narHash": "sha256-3PadsTzuMJT/x0KmiD/Me1GG6rW8kaHoWVduSs0ue7o=",
+        "lastModified": 1735651292,
+        "narHash": "sha256-YLbzcBtYo1/FEzFsB3AnM16qFc6fWPMIoOuSoDwvg9g=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "89bb5c5da7a857869cc88ef9b856bffdff8af264",
+        "rev": "0da3c44a9460a26d2025ec3ed2ec60a895eb1114",
         "type": "github"
       },
       "original": {
         "owner": "nixos",
+        "ref": "release-24.05",
         "repo": "nixpkgs",
         "type": "github"
-      }
-    },
-    "qemu_10_2_0_src": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1766519425,
-        "narHash": "sha256-AChxthS2EbOyMae4SskpqGBF8CbdRxN6L64KUCwybI4=",
-        "type": "tarball",
-        "url": "https://download.qemu.org/qemu-10.2.0.tar.xz"
-      },
-      "original": {
-        "type": "tarball",
-        "url": "https://download.qemu.org/qemu-10.2.0.tar.xz"
       }
     },
     "root": {
       "inputs": {
-        "linux_6_17_src": "linux_6_17_src",
-        "linux_7_rc1_src": "linux_7_rc1_src",
-        "nixpkgs": "nixpkgs",
-        "qemu_10_2_0_src": "qemu_10_2_0_src"
+        "linux_6_14_first_bad_7460b470a131_src": "linux_6_14_first_bad_7460b470a131_src",
+        "linux_6_14_last_good_4b94c18d1519_src": "linux_6_14_last_good_4b94c18d1519_src",
+        "linux_7_0_rc1_src": "linux_7_0_rc1_src",
+        "nixpkgs": "nixpkgs"
       }
     }
   },

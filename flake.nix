@@ -2,20 +2,22 @@
   description = "Reproducible madv kernel regression test";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs";
+    nixpkgs.url = "github:nixos/nixpkgs/release-24.05";
 
-    linux_6_17_src = {
-      url = "https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.17.tar.xz";
+    # Source of the last good Linux kernel (parent of the first bad kernel below):
+    linux_6_14_last_good_4b94c18d1519_src = {
+      url = "https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/snapshot/linux-4b94c18d15199658f1a86231663e97d3cc12d8de.tar.gz";
+      flake = false;
+    };
+    # Source of the first bad Linux kernel:
+    # https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=7460b470a131f985a70302a322617121efdd7caa
+    linux_6_14_first_bad_7460b470a131_src = {
+      url = "https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/snapshot/linux-7460b470a131f985a70302a322617121efdd7caa.tar.gz";
       flake = false;
     };
 
-    linux_7_rc1_src = {
+    linux_7_0_rc1_src = {
       url = "https://git.kernel.org/torvalds/t/linux-7.0-rc1.tar.gz";
-      flake = false;
-    };
-
-    qemu_10_2_0_src = {
-      url = "https://download.qemu.org/qemu-10.2.0.tar.xz";
       flake = false;
     };
   };
@@ -24,93 +26,67 @@
     {
       self,
       nixpkgs,
-      linux_6_17_src,
-      linux_7_rc1_src,
-      qemu_10_2_0_src,
+      linux_6_14_last_good_4b94c18d1519_src,
+      linux_6_14_first_bad_7460b470a131_src,
+      linux_7_0_rc1_src,
     }:
     let
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
 
-      linux_6_12_74 = pkgs.linux_6_12;
-      # Linux 6.17 was removed from nixpkgs (EOL upstream).
-      # Define it locally by overriding the 6.12 kernel source.
-      linux_6_17_0 = pkgs.linux_6_12.override {
-        argsOverride = rec {
-          version = "6.17";
-          modDirVersion = "6.17.0";
-          src = linux_6_17_src;
-          ignoreConfigErrors = true;
-          structuredExtraConfig = with pkgs.lib.kernel; {
-            RUST = pkgs.lib.mkForce no;
-          };
-        };
-      };
-      linux_6_18_13 = pkgs.linux_6_18;
-      linux_6_19_3 = pkgs.linux_6_19;
-
-      linux_7_0_0_rc1 = pkgs.buildLinux {
-        version = "7.0-rc1";
-        modDirVersion = "7.0.0-rc1";
-        src = linux_7_rc1_src;
-        ignoreConfigErrors = true;
-      };
-
-      linux_HEAD_Makefile = builtins.readFile ./linux/Makefile;
-      var =
-        name:
+      # Build a Linux kernel from the given source directory:
+      buildLinux =
+        src:
         let
-          m = builtins.match ".*\n${name} = ([^\n]*)\n.*" linux_HEAD_Makefile;
-        in
-        if m == null then "" else builtins.head m;
-
-      # linux_HEAD = pkgs.buildLinux {
-      #   version = "${var "VERSION"}.${var "PATCHLEVEL"}.${var "SUBLEVEL"}${var "EXTRAVERSION"}";
-      #   src = ./linux;
-      #   ignoreConfigErrors = true;
-      # };
-
-      linux_HEAD = pkgs.linux_6_12.override {
-        argsOverride = rec {
+          makefile = builtins.readFile "${src}/Makefile";
+          var =
+            name:
+            let
+              m = builtins.match ".*\n${name} = ([^\n]*)\n.*" makefile;
+            in
+            if m == null then "" else builtins.head m;
           version = "${var "VERSION"}.${var "PATCHLEVEL"}.${var "SUBLEVEL"}${var "EXTRAVERSION"}";
-          modDirVersion = version;
-          src = ./linux;
-          ignoreConfigErrors = true;
-          structuredExtraConfig = with pkgs.lib.kernel; {
-            RUST = pkgs.lib.mkForce no;
+        in
+        if pkgs.lib.versionAtLeast version "7.0.0" then
+          pkgs.buildLinux {
+            inherit version src;
+            ignoreConfigErrors = true;
+          }
+        else
+          pkgs.linux_6_12.override {
+            argsOverride = rec {
+              inherit version src;
+              modDirVersion = version;
+              ignoreConfigErrors = true;
+              structuredExtraConfig = with pkgs.lib.kernel; {
+                RUST = pkgs.lib.mkForce no;
+              };
+            };
           };
-        };
-      };
 
+      linux_6_14_last_good_4b94c18d1519 = buildLinux linux_6_14_last_good_4b94c18d1519_src;
+      linux_6_14_first_bad_7460b470a131 = buildLinux linux_6_14_first_bad_7460b470a131_src;
+      linux_7_0_rc1 = buildLinux linux_7_0_rc1_src;
+      linux_HEAD = buildLinux ./linux;
 
-      linuxPackages_6_12_74 = pkgs.linuxKernel.packages.linux_6_12;
-      linuxPackages_6_17_0 = pkgs.linuxPackagesFor linux_6_17_0;
-      linuxPackages_6_18_13 = pkgs.linuxKernel.packages.linux_6_18;
-      linuxPackages_6_19_3 = pkgs.linuxKernel.packages.linux_6_19;
-      linuxPackages_7_0_0_rc1 = pkgs.linuxPackagesFor linux_7_0_0_rc1;
+      linuxPackages_6_14_last_good_4b94c18d1519 = pkgs.linuxPackagesFor linux_6_14_last_good_4b94c18d1519;
+      linuxPackages_6_14_first_bad_7460b470a131 = pkgs.linuxPackagesFor linux_6_14_first_bad_7460b470a131;
+      linuxPackages_7_0_rc1 = pkgs.linuxPackagesFor linux_7_0_rc1;
       linuxPackages_HEAD = pkgs.linuxPackagesFor linux_HEAD;
-
-      qemu_10_2_0 = pkgs.qemu_kvm.overrideAttrs (_oldAttrs: {
-        version = "10.2.0";
-        src = qemu_10_2_0_src;
-      });
-      qemu_10_2_1 = pkgs.qemu_kvm;
 
       inherit (self.packages.${system}) thp-madv-remove-test;
 
-      # A function that returns a NixOS test that spawns a VM
-      # run via the given QEMU package and booting the given Linux kernel,
-      # then runs the thp-madv-remove-test binary inside the VM
-      # to check for the presence of the regression.
+      # A function that returns a NixOS test that spawns a VM booting the given Linux kernel,
+      # then waits for the system to boot and reach target multi-user.target
+      # and finally runs the thp-madv-remove-test binary to check for the presence of the regression.
       test =
-        qemuPackage: linuxPackages:
+        linuxPackages:
         pkgs.testers.nixosTest {
           name = "thp-madv-remove-test";
 
           nodes.machine =
             { lib, ... }:
             {
-              virtualisation.qemu.package = lib.mkForce qemuPackage;
               virtualisation.memorySize = 16 * 1024;
               virtualisation.cores = 32;
               boot.kernelPackages = linuxPackages;
@@ -139,14 +115,10 @@
 
       packages.${system} = {
         inherit
-          linux_6_12_74
-          linux_6_17_0
-          linux_6_18_13
-          linux_6_19_3
-          linux_7_0_0_rc1
+          linux_6_14_last_good_4b94c18d1519
+          linux_6_14_first_bad_7460b470a131
+          linux_7_0_rc1
           linux_HEAD
-          qemu_10_2_0
-          qemu_10_2_1
           ;
 
         thp-madv-remove-test = pkgs.rustPlatform.buildRustPackage {
@@ -167,17 +139,10 @@
       };
 
       checks.${system} = {
-        test_qemu_10_2_0_kernel_6_12_74 = test qemu_10_2_0 linuxPackages_6_12_74;
-        test_qemu_10_2_0_kernel_6_17_0 = test qemu_10_2_0 linuxPackages_6_17_0;
-        test_qemu_10_2_0_kernel_6_18_13 = test qemu_10_2_0 linuxPackages_6_18_13;
-        test_qemu_10_2_0_kernel_6_19_3 = test qemu_10_2_0 linuxPackages_6_19_3;
-
-        test_qemu_10_2_1_kernel_6_12_74 = test qemu_10_2_1 linuxPackages_6_12_74;
-        test_qemu_10_2_1_kernel_6_17_0 = test qemu_10_2_1 linuxPackages_6_17_0;
-        test_qemu_10_2_1_kernel_6_18_13 = test qemu_10_2_1 linuxPackages_6_18_13;
-        test_qemu_10_2_1_kernel_6_19_3 = test qemu_10_2_1 linuxPackages_6_19_3;
-        test_qemu_10_2_1_kernel_7_0_0_rc1 = test qemu_10_2_1 linuxPackages_7_0_0_rc1;
-        test_qemu_10_2_1_kernel_HEAD = test qemu_10_2_1 linuxPackages_HEAD;
+        test_kernel_6_14_last_good_4b94c18d1519 = test linuxPackages_6_14_last_good_4b94c18d1519;
+        test_kernel_6_14_first_bad_7460b470a131 = test linuxPackages_6_14_first_bad_7460b470a131;
+        test_kernel_7_0_rc1 = test linuxPackages_7_0_rc1;
+        test_kernel_HEAD = test linuxPackages_HEAD;
       };
     };
 }
